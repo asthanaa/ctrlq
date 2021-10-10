@@ -34,7 +34,7 @@ class control:
 
     """
     
-    def __init__(self, pulse_, ham, solver='ode', nstep=500, iprint=2):
+    def __init__(self, pulse_, ham, solver='ode', nstep=500, iprint=5):
         
         self.pulse = pulse_
         self.ham = ham
@@ -133,19 +133,21 @@ class control:
                 nrm = numpy.linalg.norm(state_)
                 self.leak = 1.0 - nrm
             staten = state_
-        staten_forced = state_  /nrm
+            staten_forced = state_  /nrm
 
 
 
-        energy2 = functools.reduce(numpy.dot,(staten_forced.conj().T, hobj.mham, staten_forced))        
-        self.energy_nonor = energy2.real[0][0]
         if len(exactV)>0 and normalize:
             ovlp = numpy.dot(staten.conj().T, exactV)
             print(' Overlap: ',ovlp*100.,'%')
         elif len(exactV)>0 and not normalize:
             ovlp = numpy.dot(staten_forced.conj().T, exactV)
             print(' Overlap: ',ovlp*100.,'%')
-            print('the correct energy error of this iteration is: {:>.4e}'.format(self.energy_nonor-exactE))
+
+            if not normalize:
+                energy2 = functools.reduce(numpy.dot,(staten_forced.conj().T, hobj.mham, staten_forced))        
+                self.energy_nonor = energy2.real[0][0]
+                print('the correct energy error of this iteration is: {:>.4e}'.format(self.energy_nonor-exactE))
         energy = functools.reduce(numpy.dot,(staten.conj().T, hobj.mham, staten))
 
         energy = energy.real[0][0]

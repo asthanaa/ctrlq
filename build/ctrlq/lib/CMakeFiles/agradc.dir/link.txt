@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -flto -shared -Wl,-soname,agradc.so -o ../../../ctrlq/lib/agradc.so CMakeFiles/agradc.dir/agradc.cc.o  libgetham.a libgrad_ana.a libgetham.a 

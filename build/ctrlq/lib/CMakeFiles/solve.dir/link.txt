@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -flto -shared -Wl,-soname,solve.so -o ../../../ctrlq/lib/solve.so CMakeFiles/solve.dir/solve.cc.o  libgetham.a 

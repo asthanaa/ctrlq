@@ -1,0 +1,1 @@
+/usr/bin/c++ -fPIC -O3 -flto -shared -Wl,-soname,trotter.so -o ../../../ctrlq/lib/trotter.so CMakeFiles/trotter.dir/trotter.cc.o  libgetham.a 

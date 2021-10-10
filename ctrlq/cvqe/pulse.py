@@ -183,7 +183,8 @@ class pulse:
                     tseq_ = []
                     for j in range(nwindow-1):
                         tseq_constraint.append((0.0, duration*tscale))
-                        tseq_.append(numpy.random.uniform(0.0, duration*tscale))
+                        #tseq_.append(numpy.random.uniform(0.0, duration*tscale))
+                        tseq_.append(duration*tscale/nwindow*(j+1))
 
                     tseq.append(sorted(tseq_))
             

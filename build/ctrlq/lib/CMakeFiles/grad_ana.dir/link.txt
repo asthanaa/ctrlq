@@ -1,0 +1,2 @@
+/usr/bin/ar qc libgrad_ana.a CMakeFiles/grad_ana.dir/grad_ana.cc.o
+/usr/bin/ranlib libgrad_ana.a

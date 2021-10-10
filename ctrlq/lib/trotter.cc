@@ -21,13 +21,16 @@
 #include <Eigen/Sparse>
 #include <unsupported/Eigen/MatrixFunctions>
 #include <cmath>
+
+#include <complex.h>
+#include <complex>
 #include <vector>
 
 #include <stdlib.h>
 #include <stdio.h>
 #include <iostream>
 #include <iomanip>
-
+#include <fstream>
 #include "getham.h"
 
 namespace py = pybind11;
@@ -49,14 +52,20 @@ Eigen::MatrixXcd solve_trotter(
   int tlen = tlist.size();
   double tau = tlist[tlen-1] / tlen;
   std::complex<double> im(0.0,-tau);
-
+  //std::ofstream f("leakage",std::ios_base::app);
+  //if (f.is_open())
+  //    f<<"start new pulse\n";
   for (int t=0; t<tlen; t++){
     H_ = getham(tlist[t], pobj, hdrive, dsham, dsham_len, matexp_);
     H1_ = im * Eigen::MatrixXcd(H_);
 
     trot_ = H1_.exp() * trot_;
+    //take norm and print norm with time parameter
+    //std::complex<double> nrm=csqrt(pow(std::abs(trot_[0]),2)+pow(std::abs(trot_[1]),2)+pow(std::abs(trot_[2]),2)+pow(std::abs(trot_[3]),2));
+    //if (f.is_open())
+    //    f<<tlist[t]<<", "<< std::abs(1.0-nrm)<<"\n";
   }
-
+  //f.close();
   return trot_;
 }  
 

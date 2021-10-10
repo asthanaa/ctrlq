@@ -46,7 +46,8 @@ def evolve(ini_vec, pobj, hobj, solver='ode', nstep=2000, twindow=True):
             tmp_ = solve_trotter2(tlist, ini_vec, pobj, numpy.array(hobj.hdrive), dsham)
         else:        
             tmp_ = solve_trotter(tlist, ini_vec, pobj, numpy.array(hobj.hdrive), dsham)
-
+        #print(tmp_)
+        #exit()
         return tmp_
 
     else:

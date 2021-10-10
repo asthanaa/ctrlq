@@ -19,7 +19,7 @@ from math import exp
 def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
              gtol = 1.0e-09, ftol = 1.0e-09, exactE = 0.0,
              normalize = False, gradient = 'numerical',
-             shape='square', optiter=True, pulse_return=False):
+             shape='square', optiter=True, pulse_return=False,exactV1=[]):
     """Variational pulse optimization:
     Perform ctrl-VQE pulse optimization using the expectation 
     value of the molecular hamiltonian supplied in ham class.
@@ -45,7 +45,9 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
     shape : str
          Shape of control pulse. 'square' and 'gaussian' forms are supported. Defaults to 'square'
     pulse_return: bool
-         Returns the pulse object if set True. Defaults to False. 
+         Returns the pulse object if set True. Defaults to False. '
+    exactV1: numpy array
+         passes exact eigenvector for printing of <Pout|exactV>
     """        
     from ctrlq.lib.solve import pulsec
 
@@ -78,7 +80,7 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
        if gradient =='numerical':
            if shape=='square':
                E_ = self.efunc(self.ham.initial_state, self.pulse, self.ham, self.solver,
-                               self.nstep, normalize, supdate=True, twindow=True)
+                               self.nstep, normalize, supdate=True, twindow=True,exactV=exactV1,exactE=exactE)
            elif shape =='flattop':
                E_ = self.gaussquare_obj(ilist, self.pulse, self.ham, self.solver,
                                self.nstep, normalize, grad=False)
@@ -111,15 +113,17 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
        if gradient=='numerical':
 
            if shape =='square':
+               #print('gradient printed initial',self.objfunc(ilist,self.pulse,self.ham,self.solver,self.nstep,normalize,False))
+               #print('gradient printed initial',self.gradfunc(ilist,self.pulse, self.ham, self.nstep))
+               #exit()
                res1 = scipy.optimize.minimize(
                    self.objfunc, ilist, args = (self.pulse, self.ham, self.solver,
-                                                self.nstep,normalize,False),
+                                                self.nstep,normalize,False,exactV1,exactE),
                    method=method,jac=True,
                    bounds = self.pulse.constraint,
                    callback = self.print_step,
                    options = {'maxiter':maxiter,'gtol':gtol,
                               'ftol':ftol,'maxls':maxls}) #, 'iprint':1,'disp':1})
-               
            elif shape =='flattop':                   
                res1 = scipy.optimize.minimize(
                    self.gaussquare_obj, ilist, args = (self.pulse, self.ham, self.solver,
@@ -140,6 +144,9 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
                    objf__ = self.anagaus
                    
                if optiter:
+
+                   #print('gradient printed initial',self.anatwin(ilist,self.pulse,self.ham,self.nstep,normalize))
+                   #exit()
                    res1 = scipy.optimize.minimize(
                        objf__, ilist, args = (self.pulse, self.ham, self.nstep,normalize),
                        method=method,jac=True,
@@ -147,6 +154,7 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
                        callback = self.print_step,
                        options = {'maxiter':maxiter,'gtol':gtol,
                                   'ftol':ftol,'maxls':maxls}) #, 'iprint':1000,'disp':1000})
+
                else:
                    objf__(ilist,self.pulse, self.ham, self.nstep,normalize)
                 
@@ -299,7 +307,14 @@ def optimize(self, method = 'l-bfgs-b', maxiter=100, maxls = 20,
                print('  Printing ends ',flush=True)
                print('  --------------------------------------',flush=True)
                print(flush=True)
-               
-       if pulse_return:
-           return(self.pulse, self.energy_,self.leak)
-       return (self.energy_,self.leak)
+       
+       if normalize: 
+
+           if pulse_return:
+               return(self.pulse, self.energy_,self.leak)
+           return (self.energy_,self.leak)
+       else:
+           if pulse_return:
+               return(self.pulse, self.energy_nonor,self.leak)
+           return (self.energy_nonor,self.leak)
+
